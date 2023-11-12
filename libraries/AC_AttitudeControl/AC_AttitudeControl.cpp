@@ -150,6 +150,48 @@ const AP_Param::GroupInfo AC_AttitudeControl::var_info[] = {
     // @User: Standard
     AP_GROUPINFO("INPUT_TC", 20, AC_AttitudeControl, _input_tc, AC_ATTITUDE_CONTROL_INPUT_TC_DEFAULT),
 
+     // @Param: EQ_IGE
+    // @DisplayName: Equation IGE
+    // @Description: Equition IGE
+    // @Range: 0 2
+    // @Increment: 1
+    // @Values: 0:Disabled, 1:Coplanar, 2:
+    // @User: Advanced
+    AP_GROUPINFO("EQ_IGE", 21, AC_AttitudeControl, _eq_ige, 1),
+
+    // @Param: alt_offset
+    // @DisplayName: Altitude offset for IGE
+    // @Description: Altitude offset for IGE
+    // @Range: -10 10
+    // @User: Advanced
+    AP_GROUPINFO("ALT_IGE", 22, AC_AttitudeControl, _alt_offset, -0.2),
+
+    // @Param: prop_rad
+    // @DisplayName: Propeller radius
+    // @Description: Propeller radius
+    // @Range: -10 10
+    // @User: Advanced
+    AP_GROUPINFO("R_IGE", 23, AC_AttitudeControl, IGE_R, 0.1194),
+    // @Param: frame_width
+    // @DisplayName: Frame width
+    // @Description: Frame width
+    // @Range: -10 10
+    // @User: Advanced
+    AP_GROUPINFO("C_IGE", 24, AC_AttitudeControl, IGE_c, 0.22),
+    // @Param: prop_spac
+    // @DisplayName: Propeller spacing
+    // @Description: Propeller spacing
+    // @Range: -10 10
+    // @User: Advanced
+    AP_GROUPINFO("D_IGE", 25, AC_AttitudeControl, IGE_d, 0.28),
+
+    // @Param: jk_ige
+    // @DisplayName: J_k parameter for IGE
+    // @Description: J_k parameter for IGE
+    // @Range: -10 10
+    // @User: Advanced
+    AP_GROUPINFO("JK_IGE", 26, AC_AttitudeControl, IGE_Jk, 2.2),
+
     AP_GROUPEND
 };
 

@@ -227,6 +227,10 @@ void AP_MotorsMatrix::output_armed_stabilizing()
     // throttle thrust input value, 0.0 - 1.0
     float throttle_thrust = get_throttle() * compensation_gain;
 
+    //For IGE:
+    float K_IGE = get_correction_IGE();
+    throttle_thrust = throttle_thrust/K_IGE;
+
     // throttle thrust average maximum value, 0.0 - 1.0
     float throttle_avg_max = _throttle_avg_max * compensation_gain;
 

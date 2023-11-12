@@ -5,6 +5,8 @@
 
 #include "AC_AttitudeControl.h"
 #include <AP_Motors/AP_MotorsMulticopter.h>
+#include <AP_InertialNav/AP_InertialNav.h>  // Inertial Navigation library
+
 
 // default rate controller PID gains
 #ifndef AC_ATC_MULTI_RATE_RP_P
@@ -41,7 +43,7 @@
 
 class AC_AttitudeControl_Multi : public AC_AttitudeControl {
 public:
-	AC_AttitudeControl_Multi(AP_AHRS_View &ahrs, const AP_MultiCopter &aparm, AP_MotorsMulticopter& motors);
+	AC_AttitudeControl_Multi(AP_AHRS_View &ahrs, const AP_InertialNav& inav, const AP_MultiCopter &aparm, AP_MotorsMulticopter& motors);
 
 	// empty destructor to suppress compiler warning
 	virtual ~AC_AttitudeControl_Multi() {}
@@ -80,6 +82,9 @@ public:
 
     // sanity check parameters.  should be called once before take-off
     void parameter_sanity_check() override;
+        
+    const AP_InertialNav&   _inav;
+
 
     // user settable parameters
     static const struct AP_Param::GroupInfo var_info[];

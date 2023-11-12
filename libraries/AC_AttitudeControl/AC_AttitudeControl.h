@@ -412,6 +412,11 @@ public:
 
     static constexpr Vector3f VECTORF_111{1.0f,1.0f,1.0f};
 
+
+    //For IGE:
+    AP_Int8 _eq_ige;
+    AP_Float _alt_offset, IGE_R, IGE_c, IGE_d, IGE_Jk;
+
 protected:
 
     // Update rate_target_ang_vel using attitude_error_rot_vec_rad

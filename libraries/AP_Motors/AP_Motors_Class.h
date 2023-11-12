@@ -283,6 +283,110 @@ public:
     };
     bool has_option(MotorOptions option) { return _options.get() & uint8_t(option); }
 
+    //For IGE:
+    public:
+    float R_ige = 0.1194;
+    float c_ige = 0.22;
+    float d_ige = 0.28;
+    float Jk_ige = 2.2;
+    float altitude_ige = 0.0;
+    float altitude_offset_ige = 0.0;
+    int8_t eq_ige = 0;
+    void set_altitude(float _alt){
+        altitude_ige = _alt;
+    }
+
+    void adjust_values(int8_t _eq_ige, float _alt_offset, float IGE_R, float IGE_c, float IGE_d, float IGE_Jk){
+        R_ige = IGE_R;
+        c_ige = IGE_c;
+        d_ige = IGE_d;
+        Jk_ige = IGE_Jk;
+        eq_ige = _eq_ige;
+        altitude_offset_ige = _alt_offset;
+    }
+
+
+
+    float get_correction_IGE(){
+
+        float z = altitude_ige - altitude_offset_ige;
+        float K_IGE = 1.0;
+        float rd = 2*d_ige-c_ige;
+        float alpha = 0.3491;
+        float beta = 0.3491;
+
+        //Safety saturations:
+        if (z<0.25*R_ige) {
+            z = 0.25*R_ige;
+        }
+        if (z>8*R_ige){
+            return K_IGE = 1;
+        }
+        
+        //Equation for coplanar rotors:
+        if (eq_ige == 1){
+            float term1 = R_ige*R_ige*z/powf(d_ige*d_ige/4+4*z*z,1.5);
+            float term2 = R_ige*R_ige*0.5*z/powf(21*d_ige*d_ige/4+4*z*z,1.5);
+            float term3 = R_ige*R_ige*z/powf(13*d_ige*d_ige/4+4*z*z,1.5);
+            float term4 = R_ige*R_ige*0.5*z/powf(7*d_ige*d_ige/4+4*z*z,1.5);
+            float term5 = 2*R_ige*R_ige*z*Jk_ige/powf(rd*rd+4*z*z,1.5);
+            K_IGE = 1/(1-term1-term2-term3-term4-term5);
+        }
+        //Equation for tilted rotors:
+        else if (eq_ige == 2){
+            if (z>0 && z<2.5*R_ige){
+                //Section 1
+
+                float Kc = 0.216;
+                float Kj = 0.841*sinf(beta);
+                float Kh = 0.826*cosf(beta);
+
+                float term1 = R_ige*R_ige*z/powf(d_ige*d_ige/4+4*z*z,1.5);
+                float term2 = R_ige*R_ige*0.5*z/powf(21*d_ige*d_ige/4+4*z*z,1.5);
+                float term3 = R_ige*R_ige*z/powf(13*d_ige*d_ige/4+4*z*z,1.5);
+                float term4 = R_ige*R_ige*0.5*z/powf(7*d_ige*d_ige/4+4*z*z,1.5);
+                float term5 = 2*R_ige*R_ige*z*Jk_ige/powf(rd*rd+4*z*z,1.5);
+
+                float f_t = Kc + Kj*cosf(alpha) + Kh*sinf(alpha);
+                K_IGE = 1/(1-(term1-term2-term3-term4)*f_t-term5);
+            }
+            else if (z < 3*R_ige) {
+                //Section 2:
+
+                float d0 = -0.0136;
+                float d1 = -0.1994;
+                float d2 = -0.1851;
+                float r0 = 1.105;
+                float r1 = 0.706;
+                float r2 = 0.329;
+
+                float A = d0+d1*cosf(alpha)*sinf(beta) + d2*sinf(alpha)*cosf(beta);
+                float B = r0+r1*cosf(alpha)*sinf(beta) + r2*sinf(alpha)*cosf(beta);
+                K_IGE = A*z/R_ige + B;
+
+            } else if (z > 3*R_ige){
+                //Section 3:
+                
+                float Kc = 0.553;
+                float Kj = -8.784*sinf(beta);
+                float Kh = 4.874*cosf(beta);
+
+                float term1 = R_ige*R_ige*z/powf(d_ige*d_ige/4+4*z*z,1.5);
+                float term2 = R_ige*R_ige*0.5*z/powf(21*d_ige*d_ige/4+4*z*z,1.5);
+                float term3 = R_ige*R_ige*z/powf(13*d_ige*d_ige/4+4*z*z,1.5);
+                float term4 = R_ige*R_ige*0.5*z/powf(7*d_ige*d_ige/4+4*z*z,1.5);
+                float term5 = 2*R_ige*R_ige*z*Jk_ige/powf(rd*rd+4*z*z,1.5);
+
+                float f_t = Kc + Kj*cosf(alpha) + Kh*sinf(alpha);
+                K_IGE = 1/(1-(term1-term2-term3-term4)*f_t-term5);
+            }
+        } else {
+            K_IGE = 1.0;
+        }
+
+        return K_IGE;
+    }
+
 protected:
     // output functions that should be overloaded by child classes
     virtual void        output_armed_stabilizing() = 0;

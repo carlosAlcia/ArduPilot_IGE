@@ -123,6 +123,10 @@ void AP_MotorsMatrix_6DoF_Scripting::output_armed_stabilizing()
     thrust_vec.x = 0.0f;
     thrust_vec.y = 0.0f;
     thrust_vec.z = throttle_thrust;
+
+    float K_IGE = get_correction_IGE();
+    thrust_vec.z = thrust_vec.z/K_IGE;
+       
     thrust_vec = rot * thrust_vec;
     for (i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++) {
         if (motor_enabled[i]) {

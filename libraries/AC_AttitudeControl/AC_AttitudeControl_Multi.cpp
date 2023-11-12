@@ -264,8 +264,9 @@ const AP_Param::GroupInfo AC_AttitudeControl_Multi::var_info[] = {
     AP_GROUPEND
 };
 
-AC_AttitudeControl_Multi::AC_AttitudeControl_Multi(AP_AHRS_View &ahrs, const AP_MultiCopter &aparm, AP_MotorsMulticopter& motors) :
+AC_AttitudeControl_Multi::AC_AttitudeControl_Multi(AP_AHRS_View &ahrs, const AP_InertialNav& inav, const AP_MultiCopter &aparm, AP_MotorsMulticopter& motors) :
     AC_AttitudeControl(ahrs, aparm, motors),
+    _inav(inav),
     _motors_multi(motors)
 {
     AP_Param::setup_object_defaults(this, var_info);
@@ -381,6 +382,15 @@ void AC_AttitudeControl_Multi::update_throttle_rpy_mix()
 
 void AC_AttitudeControl_Multi::rate_controller_run()
 {
+    //Pass altitude value for IGE.
+    _motors.set_altitude(_inav.get_position_z_up_cm()/100);
+    static int count = 0;
+    count++;
+    if(count % 220 == 0) {
+        _motors.adjust_values(_eq_ige, _alt_offset, IGE_R, IGE_c, IGE_d, IGE_Jk);
+        count = 0;
+    }
+
     // boost angle_p/pd each cycle on high throttle slew
     update_throttle_gain_boost();
 
