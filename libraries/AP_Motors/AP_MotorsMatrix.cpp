@@ -230,6 +230,8 @@ void AP_MotorsMatrix::output_armed_stabilizing()
     //For IGE:
     float K_IGE = get_correction_IGE();
     throttle_thrust = throttle_thrust/K_IGE;
+    AP::logger().Write("KIGE", "TimeUS, K_IGE", "Qf",AP_HAL::micros64(), (double)K_IGE);
+
 
     // throttle thrust average maximum value, 0.0 - 1.0
     float throttle_avg_max = _throttle_avg_max * compensation_gain;

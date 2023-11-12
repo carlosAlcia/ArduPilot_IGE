@@ -23,6 +23,7 @@
 #include <SRV_Channel/SRV_Channel.h>
 #include <GCS_MAVLink/GCS.h>
 
+
 extern const AP_HAL::HAL& hal;
 
 void AP_MotorsMatrix_6DoF_Scripting::output_to_motors()
@@ -126,6 +127,8 @@ void AP_MotorsMatrix_6DoF_Scripting::output_armed_stabilizing()
 
     float K_IGE = get_correction_IGE();
     thrust_vec.z = thrust_vec.z/K_IGE;
+    AP::logger().Write("KIGE", "TimeUS, K_IGE", "Qf",AP_HAL::micros64(), (double)K_IGE);
+
        
     thrust_vec = rot * thrust_vec;
     for (i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++) {

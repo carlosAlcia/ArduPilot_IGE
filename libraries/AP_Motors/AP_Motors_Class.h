@@ -5,6 +5,8 @@
 #include <Filter/Filter.h>         // filter library
 #include <Filter/DerivativeFilter.h>
 #include <GCS_MAVLink/GCS_MAVLink.h>
+#include <AP_Logger/AP_Logger.h>            
+
 
 // offsets for motors in motor_out and _motor_filtered arrays
 #define AP_MOTORS_MOT_1 0U
@@ -347,8 +349,8 @@ public:
                 float term4 = R_ige*R_ige*0.5*z/powf(7*d_ige*d_ige/4+4*z*z,1.5);
                 float term5 = 2*R_ige*R_ige*z*Jk_ige/powf(rd*rd+4*z*z,1.5);
 
-                float f_t = Kc + Kj*cosf(alpha) + Kh*sinf(alpha);
-                K_IGE = 1/(1-(term1-term2-term3-term4)*f_t-term5);
+                float ft = Kc + Kj*cosf(alpha) + Kh*sinf(alpha);
+                K_IGE = 1/(1-(term1+term2+term3+term4)*ft-term5);
             }
             else if (z < 3*R_ige) {
                 //Section 2:
@@ -377,8 +379,8 @@ public:
                 float term4 = R_ige*R_ige*0.5*z/powf(7*d_ige*d_ige/4+4*z*z,1.5);
                 float term5 = 2*R_ige*R_ige*z*Jk_ige/powf(rd*rd+4*z*z,1.5);
 
-                float f_t = Kc + Kj*cosf(alpha) + Kh*sinf(alpha);
-                K_IGE = 1/(1-(term1-term2-term3-term4)*f_t-term5);
+                float ft = Kc + Kj*cosf(alpha) + Kh*sinf(alpha);
+                K_IGE = 1/(1-(term1+term2+term3+term4)*ft-term5);
             }
         } else {
             K_IGE = 1.0;
